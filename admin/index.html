@@ -194,8 +194,10 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
             <a class="btn btn-amber" id="shareWa" target="_blank">💬 WhatsApp</a>
             <button class="btn btn-ghost" id="copyLink">🔗 Copy link</button>
             <a class="btn btn-ghost" id="shareReview" target="_blank">★ Review link</a>
+            <a class="btn btn-ghost" id="askReview" target="_blank">⭐ Ask for a review</a>
           </div>
         </div>
+        <div id="reviewHint" style="margin-top:12px"></div>
       </div>
       <h3 style="font-size:20px;color:var(--navy);margin:6px 0 10px">Flyers</h3>
       <div class="grid g4" id="flyerGrid"></div>
@@ -407,9 +409,22 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
     const msg=`Don't buy a new one — we fix it for you. 🔧\n\nP4 Eminent Global — handyman, electronics & equipment restoration.\nFree quotes: ${url}\n${P4.isSet(S.phone)?'📞 '+S.phone:''}`;
     $('shareWa').href='https://wa.me/?text='+encodeURIComponent(msg);
     $('copyLink').onclick=()=>{navigator.clipboard.writeText(url);$('copyLink').textContent='✓ Copied';setTimeout(()=>$('copyLink').textContent='🔗 Copy link',1500);};
+    // Review link to share with customers: Google when set, else the email review form.
+    const emailReview = 'mailto:'+encodeURIComponent(S.email)+
+      '?subject='+encodeURIComponent('My review of P4 Eminent Global')+
+      '&body='+encodeURIComponent('My rating: ★★★★★   (delete any stars to lower it)\n\nWhat you fixed for me:\n\n\nHow it went:\n\n\nYou can use my review publicly:  Yes / No\n\nName: \n');
     const rv=$('shareReview');
-    if(P4.isSet(S.reviewUrl)){rv.href=S.reviewUrl;rv.style.opacity=1;rv.style.pointerEvents='auto';}
-    else{rv.removeAttribute('href');rv.style.opacity=.5;rv.style.pointerEvents='none';rv.title='Add your Google review link in Settings';}
+    const usingGoogle = P4.isSet(S.reviewUrl);
+    rv.href = usingGoogle ? S.reviewUrl : emailReview;
+    rv.textContent = usingGoogle ? '★ Google review link' : '★ Email review link';
+    rv.title = usingGoogle ? 'Your Google review link' : 'No Google Business Profile yet — this collects reviews by email. Add the Google link in Settings.';
+    $('reviewHint').innerHTML = usingGoogle
+      ? `<span class="ok" style="display:inline-block">✓ Google review link active — customers go straight to your listing.</span>`
+      : `<span class="note" style="display:inline-block">Reviews currently come in by <b>email</b>. To collect <b>Google</b> reviews, create a Google Business Profile, then paste its review link in <b>Settings</b>.</span>`;
+
+    // Ask-for-review message customers can be sent directly
+    const askMsg = `Thanks for choosing P4 Eminent Global! 🔧\nIf we did a good job, a quick review really helps:\n${usingGoogle ? S.reviewUrl : 'reply to this message or email '+S.email}`;
+    $('askReview').href = 'https://wa.me/?text='+encodeURIComponent(askMsg);
 
     $('flyerGrid').innerHTML = FLYERS.map(([f,t,d])=>`
       <div class="kit">

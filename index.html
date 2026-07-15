@@ -427,14 +427,22 @@ footer a:hover{color:var(--amber)}
   const call = document.getElementById('heroCall');
   if (P4.isSet(S.phone)) { call.href = P4.telHref(S.phone); call.textContent = '📞 ' + S.phone; }
 
-  // google review
+  // reviews — Google link when configured, otherwise a pre-filled email review
   const rc = document.getElementById('reviewCta');
+  const emailReview = 'mailto:' + encodeURIComponent(S.email) +
+    '?subject=' + encodeURIComponent('My review of P4 Eminent Global') +
+    '&body=' + encodeURIComponent(
+      'My rating: ★★★★★   (delete any stars to lower it)\n\n' +
+      'What you fixed for me:\n\n\n' +
+      'How it went:\n\n\n' +
+      'You can use my review publicly:  Yes / No\n\n' +
+      'Name: \n');
   if (P4.isSet(S.reviewUrl)) {
-    rc.innerHTML = `<a class="btn btn-amber" href="${S.reviewUrl}" target="_blank" rel="noopener">★ Leave us a Google review</a>`;
+    rc.innerHTML =
+      `<a class="btn btn-amber" href="${S.reviewUrl}" target="_blank" rel="noopener">★ Leave us a Google review</a>
+       <a class="btn btn-ghost" href="${emailReview}" style="margin-left:10px">✉️ Review by email</a>`;
   } else {
-    rc.innerHTML = `<span class="btn btn-amber" style="opacity:.55;cursor:not-allowed">★ Leave us a Google review</span>
-      <div class="needs-setup" style="display:inline-block;margin-left:10px">Add your Google review link in the admin portal.</div>`;
-    document.getElementById('navReview').style.display='none';
+    rc.innerHTML = `<a class="btn btn-amber" href="${emailReview}">★ Leave us a review</a>`;
   }
 
   // ---- booking / quote delivery (static site: routes to email + WhatsApp) ----
