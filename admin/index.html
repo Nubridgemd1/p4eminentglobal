@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin · P4 Eminent Global</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0F2233; --navy-2:#17324A; --navy-3:#0A1826;
+  --amber:#F5A623; --amber-d:#D98A0B;
+  --steel:#5B6B7C; --line:#E3E9EF; --off:#F7F9FB;
+  --ink:#101922; --ink-2:#4A5865; --green:#1E9E5A; --red:#C7443B;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--off);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.disp{font-family:'Barlow Condensed',sans-serif;font-weight:800;line-height:1.1}
+.mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--amber),var(--amber-d));
+      display:grid;place-items:center;font-family:'Barlow Condensed';font-weight:800;color:var(--navy-3);font-size:18px}
+input,select,textarea{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;font:inherit;font-size:14px;background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--amber);outline-offset:1px;border-color:var(--amber)}
+label{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);margin-bottom:5px}
+.btn{border:0;cursor:pointer;font-weight:700;border-radius:8px;padding:10px 18px;font-size:14px;text-decoration:none;display:inline-block;transition:.15s}
+.btn-amber{background:var(--amber);color:var(--navy-3)} .btn-amber:hover{background:#ffb838}
+.btn-navy{background:var(--navy);color:#fff} .btn-navy:hover{background:var(--navy-2)}
+.btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)} .btn-ghost:hover{border-color:var(--amber)}
+.btn-red{background:#fdecea;color:var(--red);border:1.5px solid #f5c6c2}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}
+
+/* login */
+#login{min-height:100vh;display:grid;place-items:center;background:var(--navy);padding:20px}
+.loginbox{background:#fff;border-radius:16px;padding:34px;width:100%;max-width:380px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.loginbox .mark{margin:0 auto 14px;width:48px;height:48px;font-size:24px}
+.loginbox h1{font-size:28px;color:var(--navy)}
+.loginbox p{font-size:13px;color:var(--ink-2);margin-top:4px}
+#pin{text-align:center;letter-spacing:.5em;font-size:20px;margin-top:18px}
+#pinErr{color:var(--red);font-size:13px;margin-top:8px;min-height:18px}
+
+/* shell */
+#app{display:none}
+.top{background:var(--navy);color:#fff;position:sticky;top:0;z-index:20}
+.top .in{max-width:1200px;margin:0 auto;padding:0 20px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.top .brand{display:flex;align-items:center;gap:10px}
+.top .brand span{font-family:'Barlow Condensed';font-weight:800;font-size:20px;letter-spacing:.02em}
+.top .brand small{color:var(--amber);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.tabs{background:var(--navy-2);position:sticky;top:62px;z-index:19;overflow-x:auto}
+.tabs .in{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;gap:4px}
+.tab{background:none;border:0;color:#A9BDD1;padding:13px 15px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;
+     border-bottom:3px solid transparent;white-space:nowrap}
+.tab:hover{color:#fff}
+.tab.active{color:var(--amber);border-bottom-color:var(--amber)}
+main{max-width:1200px;margin:0 auto;padding:24px 20px 70px}
+.page{display:none} .page.active{display:block}
+.phead{margin-bottom:18px}
+.phead h2{font-size:30px;color:var(--navy)}
+.phead p{font-size:14px;color:var(--ink-2)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.field{margin-bottom:12px}
+.stat .n{font-family:'Barlow Condensed';font-size:34px;font-weight:800;color:var(--navy);line-height:1}
+.stat .l{font-size:12px;color:var(--ink-2);margin-top:2px}
+.stat .ic{font-size:20px;margin-bottom:6px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);padding:0 8px 9px;border-bottom:1px solid var(--line)}
+td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.pill{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px}
+.p-new{background:#FFF4E0;color:#8a5d00}
+.p-booked{background:#E6F2FF;color:#0057BB}
+.p-done{background:#E7F6EC;color:#127a37}
+.empty{text-align:center;padding:44px 20px;color:var(--ink-2);font-size:14px}
+.note{background:#FFF6E5;border:1px dashed var(--amber-d);color:#8a5d00;font-size:12.5px;padding:10px 12px;border-radius:8px}
+.ok{background:#E7F6EC;border:1px solid #bfe6cd;color:#127a37;font-size:12.5px;padding:10px 12px;border-radius:8px}
+.kit{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.kit .thumb{aspect-ratio:1/1.414;background:var(--off);display:grid;place-items:center;overflow:hidden;border-bottom:1px solid var(--line)}
+.kit .thumb img{width:100%;height:100%;object-fit:cover}
+.kit .thumb.vid{aspect-ratio:9/16}
+.kit .body{padding:12px}
+.kit h4{font-size:15px;color:var(--navy);font-family:'Inter';font-weight:700}
+.kit p{font-size:12px;color:var(--ink-2);margin-top:2px}
+.kit .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.kit .acts a{font-size:12px;padding:6px 10px}
+@media(max-width:820px){ .g2,.g3{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="loginbox">
+    <div class="mark">P4</div>
+    <h1>Admin Portal</h1>
+    <p>P4 Eminent Global</p>
+    <input id="pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off">
+    <div id="pinErr"></div>
+    <button class="btn btn-amber" id="loginBtn" style="width:100%">Sign in</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="top">
+    <div class="in">
+      <div class="brand"><div class="mark">P4</div>
+        <div><span>EMINENT GLOBAL</span><br><small>Admin Portal</small></div></div>
+      <div class="row">
+        <a class="btn btn-ghost" href="../" target="_blank">View site ↗</a>
+        <button class="btn btn-ghost" id="logout">Sign out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs"><div class="in" id="tabs"></div></div>
+
+  <main>
+    <!-- DASHBOARD -->
+    <div class="page active" id="pg-dash">
+      <div class="phead"><h2>Dashboard</h2><p>Your business at a glance.</p></div>
+      <div id="setupNote"></div>
+      <div class="grid g4" style="margin-top:14px" id="stats"></div>
+      <div class="card" style="margin-top:16px">
+        <h3 style="font-size:20px;color:var(--navy)">Recent jobs</h3>
+        <div id="recent" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- JOBS -->
+    <div class="page" id="pg-jobs">
+      <div class="phead"><h2>Bookings &amp; Jobs</h2><p>Log every enquiry and track it through to completion.</p></div>
+      <div class="card">
+        <h3 style="font-size:19px;color:var(--navy)">Add a job</h3>
+        <div class="grid g3" style="margin-top:12px">
+          <div class="field"><label>Customer</label><input id="jName"></div>
+          <div class="field"><label>Phone</label><input id="jPhone"></div>
+          <div class="field"><label>Service</label><select id="jService"></select></div>
+        </div>
+        <div class="grid g3">
+          <div class="field"><label>Date</label><input id="jDate" type="date"></div>
+          <div class="field"><label>Quoted ($)</label><input id="jQuote" type="number" min="0" step="1"></div>
+          <div class="field"><label>Status</label>
+            <select id="jStatus"><option value="new">New enquiry</option><option value="booked">Booked</option><option value="done">Completed</option></select>
+          </div>
+        </div>
+        <div class="field"><label>Fault / notes</label><textarea id="jNotes" rows="2"></textarea></div>
+        <button class="btn btn-amber" id="addJob">Add job</button>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="row" style="justify-content:space-between">
+          <h3 style="font-size:19px;color:var(--navy)">All jobs</h3>
+          <select id="jFilter" style="width:auto">
+            <option value="all">All statuses</option><option value="new">New</option>
+            <option value="booked">Booked</option><option value="done">Completed</option>
+          </select>
+        </div>
+        <div id="jobsTable" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="page" id="pg-services">
+      <div class="phead"><h2>Services &amp; Pricing</h2><p>Edit what you offer and the "quotes from" price shown on the site.</p></div>
+      <div id="svcEditor" class="grid g2"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn btn-amber" id="saveSvc">Save services</button>
+        <button class="btn btn-ghost" id="resetSvc">Reset to defaults</button>
+        <span id="svcMsg"></span>
+      </div>
+    </div>
+
+    <!-- SPECS -->
+    <div class="page" id="pg-specs">
+      <div class="phead"><h2>Job Specification</h2><p>The scope, pricing terms and commitments published on your site.</p></div>
+      <div class="note">These are shown publicly under <b>Job details</b>. Keep them accurate — customers rely on them.</div>
+      <div class="grid g2" style="margin-top:14px" id="specEditor"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn btn-amber" id="saveSpec">Save specification</button>
+        <span id="specMsg"></span>
+      </div>
+    </div>
+
+    <!-- MARKETING -->
+    <div class="page" id="pg-kit">
+      <div class="phead"><h2>Marketing Kit</h2><p>Ready-to-share flyers and videos. Download, print, or send straight to WhatsApp.</p></div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="row" style="justify-content:space-between">
+          <div><h3 style="font-size:19px;color:var(--navy)">Share your site</h3>
+          <p style="font-size:13px;color:var(--ink-2)">One tap to send your link and offer.</p></div>
+          <div class="row">
+            <a class="btn btn-amber" id="shareWa" target="_blank">💬 WhatsApp</a>
+            <button class="btn btn-ghost" id="copyLink">🔗 Copy link</button>
+            <a class="btn btn-ghost" id="shareReview" target="_blank">★ Review link</a>
+          </div>
+        </div>
+      </div>
+      <h3 style="font-size:20px;color:var(--navy);margin:6px 0 10px">Flyers</h3>
+      <div class="grid g4" id="flyerGrid"></div>
+      <h3 style="font-size:20px;color:var(--navy);margin:22px 0 10px">Videos</h3>
+      <div class="grid g4" id="videoGrid"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="pg-settings">
+      <div class="phead"><h2>Settings</h2><p>Contact details and links used across the site, flyers and booking.</p></div>
+      <div class="card">
+        <div class="grid g2">
+          <div class="field"><label>Phone</label><input id="sPhone"></div>
+          <div class="field"><label>Email (receives bookings)</label><input id="sEmail" type="email"></div>
+        </div>
+        <div class="grid g2">
+          <div class="field"><label>Service area</label><input id="sArea" placeholder="e.g. New York & surrounding areas"></div>
+          <div class="field"><label>Opening hours</label><input id="sHours"></div>
+        </div>
+        <div class="field">
+          <label>Google review link</label>
+          <input id="sReview" placeholder="https://g.page/r/…/review">
+          <p style="font-size:12px;color:var(--ink-2);margin-top:5px">Google Business Profile → <b>Ask for reviews</b> → copy the link.</p>
+        </div>
+        <div class="field"><label>Admin PIN</label><input id="sPin" maxlength="6" inputmode="numeric"></div>
+        <div class="row"><button class="btn btn-amber" id="saveSet">Save settings</button><span id="setMsg"></span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../config.js"></script>
+<script>
+(function(){
+  const PIN_KEY='p4-pin', JOBS_KEY='p4-jobs', SVC_KEY='p4-services', SPEC_KEY='p4-specs';
+  const getPin = () => localStorage.getItem(PIN_KEY) || '4321';
+  const $ = id => document.getElementById(id);
+  const money = n => '$' + Number(n||0).toLocaleString();
+
+  /* ---------- login ---------- */
+  function unlock(){ $('login').style.display='none'; $('app').style.display='block'; boot(); }
+  $('loginBtn').onclick = () => {
+    if ($('pin').value === getPin()) { sessionStorage.setItem('p4-auth','1'); unlock(); }
+    else { $('pinErr').textContent='Incorrect PIN. Try again.'; $('pin').value=''; }
+  };
+  $('pin').addEventListener('keydown', e => { if(e.key==='Enter') $('loginBtn').click(); });
+  $('logout').onclick = () => { sessionStorage.removeItem('p4-auth'); location.reload(); };
+  if (sessionStorage.getItem('p4-auth')==='1') unlock();
+
+  /* ---------- tabs ---------- */
+  const TABS=[['dash','Dashboard'],['jobs','Bookings & Jobs'],['services','Services & Pricing'],
+              ['specs','Job Specification'],['kit','Marketing Kit'],['settings','Settings']];
+  $('tabs').innerHTML = TABS.map(([id,l],i)=>`<button class="tab${i?'':' active'}" data-t="${id}">${l}</button>`).join('');
+  $('tabs').onclick = e => {
+    const b = e.target.closest('.tab'); if(!b) return;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t===b));
+    document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', p.id==='pg-'+b.dataset.t));
+  };
+
+  /* ---------- data ---------- */
+  const load = (k,d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(e){ return d; } };
+  const save = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+  let services = load(SVC_KEY, null) || JSON.parse(JSON.stringify(window.P4_SERVICES_DEFAULT));
+  let jobs = load(JOBS_KEY, []);
+
+  const SPEC_DEFAULT = [
+    {h:'Scope of work', rows:[['Diagnosis','Full fault-finding and a written summary of what\'s actually wrong.'],
+      ['Written quote','Itemised parts and labour, sent before we start. No surprises.'],
+      ['Repair & test','The repair carried out, then function-tested before hand-back.'],
+      ['Clean hand-back','Work area cleared, old parts returned or disposed of on request.']]},
+    {h:'Pricing & terms', rows:[['Quotes','Free and no-obligation. You approve before any work starts.'],
+      ['Call-out & diagnosis','Quoted upfront and credited against the repair if you proceed.'],
+      ['Parts','Quality parts, quoted separately so you can see exactly what you\'re paying for.'],
+      ['Payment','Due on completion once you\'re satisfied the item works.']]},
+    {h:'What we need from you', rows:[['The fault','What it does, when it started, and anything already tried.'],
+      ['Make & model','Helps us bring the right parts on the first visit.'],
+      ['Photos','A photo of the item and any error message speeds up the quote.'],
+      ['Access','Somewhere safe to work, and power if the job needs it.']]},
+    {h:'Our commitment', rows:[['Honesty first','If replacing genuinely beats repairing, we\'ll tell you plainly.'],
+      ['Workmanship','If the same fault returns, bring it back — we\'ll make it right.'],
+      ['Timeliness','We turn up when we say, and keep you posted if anything changes.'],
+      ['Care','Your property treated like our own, every visit.']]},
+  ];
+  let specs = load(SPEC_KEY, null) || JSON.parse(JSON.stringify(SPEC_DEFAULT));
+
+  const FLYERS=[['flyer1','Don\'t Replace It','Bold hero — the core promise'],
+    ['flyer2','Services Menu','All four service lines + prices'],
+    ['flyer3','Before You Buy New','Cost-comparison angle'],
+    ['flyer4','Same-Week Booking','Urgency + easy booking'],
+    ['flyer5','Free Quote Offer','Quote-led, QR to book']];
+  const VIDEOS=[['video1','Don\'t Replace It','~15s · vertical'],
+    ['video2','What We Fix','~15s · vertical'],
+    ['video3','How It Works','~15s · vertical'],
+    ['video4','Free Quote','~12s · vertical'],
+    ['video5','Book Today','~12s · vertical']];
+
+  /* ---------- boot ---------- */
+  function boot(){ renderSettings(); renderDash(); renderJobs(); renderSvc(); renderSpec(); renderKit(); }
+
+  /* dashboard */
+  function renderDash(){
+    const S=P4.get(), miss=[];
+    if(!P4.isSet(S.area)) miss.push('service area');
+    if(!P4.isSet(S.reviewUrl)) miss.push('Google review link');
+    $('setupNote').innerHTML = miss.length
+      ? `<div class="note">⚠️ Finish setup: add your <b>${miss.join('</b> and <b>')}</b> in <b>Settings</b> so they appear on your site and flyers.</div>`
+      : `<div class="ok">✓ Setup complete — contact details, service area and review link are live.</div>`;
+    const done = jobs.filter(j=>j.status==='done');
+    const rev = done.reduce((a,j)=>a+Number(j.quote||0),0);
+    const cards=[['🗂️',jobs.length,'Total jobs'],['🆕',jobs.filter(j=>j.status==='new').length,'New enquiries'],
+                 ['📅',jobs.filter(j=>j.status==='booked').length,'Booked'],['💵',money(rev),'Completed value']];
+    $('stats').innerHTML = cards.map(([i,n,l])=>
+      `<div class="card stat"><div class="ic">${i}</div><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+    const r = jobs.slice().reverse().slice(0,5);
+    $('recent').innerHTML = r.length ? table(r) : `<div class="empty">No jobs yet. Add one under <b>Bookings &amp; Jobs</b>.</div>`;
+  }
+
+  /* jobs */
+  const PILL={new:'p-new',booked:'p-booked',done:'p-done'};
+  const LBL={new:'New',booked:'Booked',done:'Completed'};
+  function table(list){
+    return `<div style="overflow-x:auto"><table><thead><tr>
+      <th>Customer</th><th>Service</th><th>Date</th><th>Quote</th><th>Status</th><th></th></tr></thead><tbody>
+      ${list.map(j=>`<tr>
+        <td><b>${esc(j.name||'—')}</b>${j.phone?`<br><span style="color:var(--ink-2);font-size:12px">${esc(j.phone)}</span>`:''}
+            ${j.notes?`<br><span style="color:var(--ink-2);font-size:12px">${esc(j.notes)}</span>`:''}</td>
+        <td>${esc(j.service||'—')}</td><td>${j.date||'—'}</td><td>${j.quote?money(j.quote):'—'}</td>
+        <td><span class="pill ${PILL[j.status]}">${LBL[j.status]}</span></td>
+        <td style="text-align:right;white-space:nowrap">
+          ${j.status!=='done'?`<button class="btn btn-ghost" style="padding:5px 9px;font-size:12px" data-adv="${j.id}">Advance</button> `:''}
+          <button class="btn btn-red" style="padding:5px 9px;font-size:12px" data-del="${j.id}">Delete</button></td>
+      </tr>`).join('')}</tbody></table></div>`;
+  }
+  function renderJobs(){
+    $('jService').innerHTML = services.map(s=>`<option>${esc(s.name)}</option>`).join('');
+    const f = $('jFilter').value;
+    const list = jobs.slice().reverse().filter(j=>f==='all'||j.status===f);
+    $('jobsTable').innerHTML = list.length ? table(list) : `<div class="empty">No jobs match.</div>`;
+  }
+  $('jFilter').onchange = renderJobs;
+  $('addJob').onclick = () => {
+    if(!$('jName').value.trim()) return alert('Add a customer name.');
+    jobs.push({ id:'j'+Date.now(), name:$('jName').value.trim(), phone:$('jPhone').value.trim(),
+      service:$('jService').value, date:$('jDate').value, quote:$('jQuote').value,
+      status:$('jStatus').value, notes:$('jNotes').value.trim() });
+    save(JOBS_KEY,jobs);
+    ['jName','jPhone','jDate','jQuote','jNotes'].forEach(i=>$(i).value='');
+    renderJobs(); renderDash();
+  };
+  document.addEventListener('click', e => {
+    const a=e.target.dataset?.adv, d=e.target.dataset?.del;
+    if(a){ const j=jobs.find(x=>x.id===a); j.status = j.status==='new'?'booked':'done'; save(JOBS_KEY,jobs); renderJobs(); renderDash(); }
+    if(d){ if(confirm('Delete this job?')){ jobs=jobs.filter(x=>x.id!==d); save(JOBS_KEY,jobs); renderJobs(); renderDash(); } }
+  });
+
+  /* services */
+  function renderSvc(){
+    $('svcEditor').innerHTML = services.map((s,i)=>`
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <h3 style="font-size:18px;color:var(--navy)">${s.icon} ${esc(s.name)}</h3>
+          <span style="font-size:11px;color:var(--ink-2)">#${i+1}</span>
+        </div>
+        <div class="field" style="margin-top:10px"><label>Name</label><input data-s="${i}" data-k="name" value="${esc(s.name)}"></div>
+        <div class="field"><label>Description</label><textarea data-s="${i}" data-k="blurb" rows="2">${esc(s.blurb)}</textarea></div>
+        <div class="grid g2">
+          <div class="field"><label>Quotes from ($)</label><input type="number" min="0" data-s="${i}" data-k="from" value="${s.from}"></div>
+          <div class="field"><label>Icon</label><input data-s="${i}" data-k="icon" value="${s.icon}"></div>
+        </div>
+        <div class="field"><label>Items (one per line)</label><textarea data-s="${i}" data-k="items" rows="4">${esc(s.items.join('\n'))}</textarea></div>
+      </div>`).join('');
+  }
+  $('saveSvc').onclick = () => {
+    document.querySelectorAll('[data-s]').forEach(el=>{
+      const i=+el.dataset.s, k=el.dataset.k;
+      services[i][k] = k==='items' ? el.value.split('\n').map(x=>x.trim()).filter(Boolean)
+                     : k==='from' ? Number(el.value)||0 : el.value;
+    });
+    save(SVC_KEY,services); flash('svcMsg','✓ Services saved'); renderJobs();
+  };
+  $('resetSvc').onclick = () => { if(!confirm('Reset services to defaults?')) return;
+    services = JSON.parse(JSON.stringify(window.P4_SERVICES_DEFAULT)); save(SVC_KEY,services); renderSvc(); flash('svcMsg','✓ Reset'); };
+
+  /* specs */
+  function renderSpec(){
+    $('specEditor').innerHTML = specs.map((b,i)=>`
+      <div class="card">
+        <div class="field"><label>Section heading</label><input data-sp="${i}" data-k="h" value="${esc(b.h)}"></div>
+        ${b.rows.map((r,j)=>`
+          <div class="grid g2" style="gap:8px">
+            <div class="field"><label>Label</label><input data-sp="${i}" data-r="${j}" data-k="0" value="${esc(r[0])}"></div>
+            <div class="field"><label>Detail</label><input data-sp="${i}" data-r="${j}" data-k="1" value="${esc(r[1])}"></div>
+          </div>`).join('')}
+      </div>`).join('');
+  }
+  $('saveSpec').onclick = () => {
+    document.querySelectorAll('[data-sp]').forEach(el=>{
+      const i=+el.dataset.sp;
+      if(el.dataset.r===undefined) specs[i].h = el.value;
+      else specs[i].rows[+el.dataset.r][+el.dataset.k] = el.value;
+    });
+    save(SPEC_KEY,specs); flash('specMsg','✓ Specification saved');
+  };
+
+  /* marketing kit */
+  function renderKit(){
+    const S=P4.get();
+    const url='https://p4eminentglobal.com';
+    const msg=`Don't buy a new one — we fix it for you. 🔧\n\nP4 Eminent Global — handyman, electronics & equipment restoration.\nFree quotes: ${url}\n${P4.isSet(S.phone)?'📞 '+S.phone:''}`;
+    $('shareWa').href='https://wa.me/?text='+encodeURIComponent(msg);
+    $('copyLink').onclick=()=>{navigator.clipboard.writeText(url);$('copyLink').textContent='✓ Copied';setTimeout(()=>$('copyLink').textContent='🔗 Copy link',1500);};
+    const rv=$('shareReview');
+    if(P4.isSet(S.reviewUrl)){rv.href=S.reviewUrl;rv.style.opacity=1;rv.style.pointerEvents='auto';}
+    else{rv.removeAttribute('href');rv.style.opacity=.5;rv.style.pointerEvents='none';rv.title='Add your Google review link in Settings';}
+
+    $('flyerGrid').innerHTML = FLYERS.map(([f,t,d])=>`
+      <div class="kit">
+        <div class="thumb"><img src="../marketing/${f}.png" alt="${t}" loading="lazy"
+             onerror="this.parentNode.innerHTML='<span style=&quot;color:var(--ink-2);font-size:12px&quot;>Not generated yet</span>'"></div>
+        <div class="body"><h4>${t}</h4><p>${d}</p>
+          <div class="acts">
+            <a class="btn btn-amber" href="../marketing/${f}.png" download>Download</a>
+            <a class="btn btn-ghost" href="../marketing/${f}.pdf" target="_blank">Print PDF</a>
+            <a class="btn btn-ghost" target="_blank"
+               href="https://wa.me/?text=${encodeURIComponent(msg)}">Share</a>
+          </div></div></div>`).join('');
+
+    $('videoGrid').innerHTML = VIDEOS.map(([f,t,d])=>`
+      <div class="kit">
+        <div class="thumb vid"><video src="../marketing/${f}.mp4" muted playsinline preload="metadata"
+             style="width:100%;height:100%;object-fit:cover" onclick="this.paused?this.play():this.pause()"></video></div>
+        <div class="body"><h4>${t}</h4><p>${d}</p>
+          <div class="acts">
+            <a class="btn btn-amber" href="../marketing/${f}.mp4" download>Download</a>
+            <a class="btn btn-ghost" href="../marketing/${f}.mp4" target="_blank">Open</a>
+          </div></div></div>`).join('');
+  }
+
+  /* settings */
+  function renderSettings(){
+    const S=P4.get();
+    $('sPhone').value=S.phone||''; $('sEmail').value=S.email||''; $('sArea').value=S.area||'';
+    $('sHours').value=S.hours||''; $('sReview').value=S.reviewUrl||''; $('sPin').value=getPin();
+  }
+  $('saveSet').onclick = () => {
+    P4.save({ phone:$('sPhone').value.trim(), email:$('sEmail').value.trim(), area:$('sArea').value.trim(),
+              hours:$('sHours').value.trim(), reviewUrl:$('sReview').value.trim() });
+    const p=$('sPin').value.trim(); if(p) localStorage.setItem(PIN_KEY,p);
+    flash('setMsg','✓ Saved'); renderDash(); renderKit();
+  };
+
+  /* utils */
+  function flash(id,t){ const e=$(id); e.textContent=t; e.style.color='var(--green)'; e.style.fontWeight='600';
+    setTimeout(()=>e.textContent='',2200); }
+  function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+})();
+</script>
+</body>
+</html>
