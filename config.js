@@ -7,7 +7,7 @@ window.P4_DEFAULTS = {
   promise: "Instead of buying a new one, we fix it for you.",
   phone: '(347) 812-9270',
   email: 'samuel.jumbo@gmail.com',
-  area: '',             // service area — set in admin (e.g. "New York & surrounding areas")
+  area: 'Houston, TX & surrounding areas',
   reviewUrl: '',        // Google review link — set in admin
   hours: 'Mon–Sat, 8:00 AM – 6:00 PM',
   site: 'p4eminentglobal.com',
