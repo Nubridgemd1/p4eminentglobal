@@ -187,6 +187,15 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
       </div>
       <div class="card" style="margin-top:16px">
         <div class="row" style="justify-content:space-between">
+          <div><h3 style="font-size:19px;color:var(--navy)">📥 Bookings from the website</h3>
+            <p style="font-size:12.5px;color:var(--ink-2)" id="inboxSub">Not connected.</p></div>
+          <button class="btn btn-ghost" id="refreshInbox">↻ Refresh</button>
+        </div>
+        <div id="inbox" style="margin-top:12px"></div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="row" style="justify-content:space-between">
           <h3 style="font-size:19px;color:var(--navy)">All jobs</h3>
           <select id="jFilter" style="width:auto">
             <option value="all">All statuses</option><option value="new">New</option>
@@ -264,6 +273,21 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
           <p style="font-size:12px;color:var(--ink-2);margin-top:5px">Google Business Profile → <b>Ask for reviews</b> → copy the link.</p>
         </div>
         <div class="field"><label>Admin PIN</label><input id="sPin" maxlength="6" inputmode="numeric"></div>
+
+        <div style="border-top:1px solid var(--line);margin:16px 0 14px"></div>
+        <h3 style="font-size:18px;color:var(--navy)">Bookings inbox</h3>
+        <p style="font-size:12.5px;color:var(--ink-2);margin-bottom:12px">
+          Connect a Google Sheet so bookings from the website appear under <b>Bookings &amp; Jobs</b>
+          automatically. Setup steps are in <b>backend/Code.gs</b> in your project (about 4 minutes, one time).</p>
+        <div class="grid g2">
+          <div class="field"><label>Bookings endpoint (Apps Script /exec URL)</label>
+            <input id="sBookUrl" placeholder="https://script.google.com/macros/s/…/exec"></div>
+          <div class="field"><label>Bookings secret</label>
+            <input id="sBookSecret" placeholder="must match SECRET in Code.gs"></div>
+        </div>
+        <div class="row"><button class="btn btn-ghost" id="testBook">Test connection</button><span id="bookMsg"></span></div>
+
+        <div style="border-top:1px solid var(--line);margin:16px 0 14px"></div>
         <div class="row"><button class="btn btn-amber" id="saveSet">Save settings</button><span id="setMsg"></span></div>
       </div>
     </div>
@@ -342,7 +366,7 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
     ['video-powerwash','Power Washing — Look New Again','~14s · vertical']];
 
   /* ---------- boot ---------- */
-  function boot(){ renderSettings(); renderDash(); renderJobs(); renderSvc(); renderSpec(); renderKit(); }
+  function boot(){ renderSettings(); renderDash(); renderJobs(); renderSvc(); renderSpec(); renderKit(); renderInbox(); }
 
   /* dashboard */
   function renderDash(){
@@ -607,17 +631,100 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
           </div></div></div>`).join('');
   }
 
+  /* ---------- bookings inbox (Google Apps Script) ---------- */
+  async function fetchBookings(){
+    const S=P4.get();
+    if(!P4.isSet(S.bookingsUrl)) return null;
+    const url = S.bookingsUrl + (S.bookingsUrl.includes('?')?'&':'?') + 'secret=' + encodeURIComponent(S.bookingsSecret||'');
+    const r = await fetch(url, { redirect:'follow' });
+    const data = await r.json();
+    if(!data.ok) throw new Error(data.error || 'endpoint refused the request');
+    return data.bookings || [];
+  }
+
+  function inboxRow(bk){
+    const already = jobs.some(j => j.srcId === bk.id);
+    const when = [bk.date, bk.time].filter(Boolean).join(' · ');
+    return `<tr>
+      <td><b>${esc(bk.name||'—')}</b>
+        <div style="color:var(--ink-2);font-size:12px">${esc(bk.phone||'')}${bk.email?' · '+esc(bk.email):''}</div>
+        ${bk.notes?`<div style="color:var(--ink-2);font-size:12px;margin-top:2px">${esc(bk.notes)}</div>`:''}
+        ${bk.address?`<div style="color:var(--ink-2);font-size:12px">📍 ${esc(bk.address)}</div>`:''}</td>
+      <td>${esc(bk.service||'—')}<div style="color:var(--ink-2);font-size:12px">${esc(bk.source||'')}</div></td>
+      <td>${esc(when||'—')}</td>
+      <td style="text-align:right;white-space:nowrap">
+        ${already
+          ? `<span class="pill p-done">✓ In jobs</span>`
+          : `<button class="btn btn-amber" style="padding:5px 10px;font-size:12px" data-imp="${esc(bk.id)}">Add to jobs</button>`}
+      </td></tr>`;
+  }
+
+  let inboxCache = [];
+  async function renderInbox(){
+    const S=P4.get();
+    if(!P4.isSet(S.bookingsUrl)){
+      $('inboxSub').textContent = 'Not connected — add your bookings endpoint in Settings to see website bookings here.';
+      $('inbox').innerHTML = `<div class="empty">Bookings currently arrive by email, text and WhatsApp.<br>
+        Connect the inbox in <b>Settings</b> to have them appear here automatically.</div>`;
+      return;
+    }
+    $('inbox').innerHTML = `<div class="empty">Loading bookings…</div>`;
+    try {
+      const list = await fetchBookings();
+      inboxCache = list;
+      $('inboxSub').textContent = list.length + (list.length===1?' booking':' bookings') + ' received from the website';
+      $('inbox').innerHTML = list.length
+        ? `<div style="overflow-x:auto"><table><thead><tr>
+             <th>Customer</th><th>Service</th><th>Preferred</th><th></th></tr></thead>
+             <tbody>${list.map(inboxRow).join('')}</tbody></table></div>`
+        : `<div class="empty">Connected ✓ — no bookings yet.</div>`;
+    } catch(err){
+      $('inboxSub').textContent = 'Connection problem.';
+      $('inbox').innerHTML = `<div class="note">Couldn't read bookings: ${esc(err.message)}.
+        Check the endpoint URL and secret in <b>Settings</b>.</div>`;
+    }
+  }
+  $('refreshInbox').onclick = renderInbox;
+
+  // import a website booking into the jobs tracker
+  document.addEventListener('click', e => {
+    const id = e.target.dataset?.imp; if(!id) return;
+    const bk = inboxCache.find(x => String(x.id) === String(id)); if(!bk) return;
+    jobs.push({ id:'j'+Date.now(), srcId:bk.id, name:bk.name, phone:bk.phone, email:bk.email,
+      service:bk.service, date:bk.date||'', quote:'', status:'new',
+      notes:[bk.notes, bk.address?('Address: '+bk.address):null].filter(Boolean).join(' — ') });
+    save(JOBS_KEY,jobs);
+    renderJobs(); renderDash(); renderInbox();
+  });
+
   /* settings */
   function renderSettings(){
     const S=P4.get();
     $('sPhone').value=S.phone||''; $('sEmail').value=S.email||''; $('sArea').value=S.area||'';
     $('sHours').value=S.hours||''; $('sReview').value=S.reviewUrl||''; $('sPin').value=getPin();
+    $('sBookUrl').value=S.bookingsUrl||''; $('sBookSecret').value=S.bookingsSecret||'';
   }
   $('saveSet').onclick = () => {
     P4.save({ phone:$('sPhone').value.trim(), email:$('sEmail').value.trim(), area:$('sArea').value.trim(),
-              hours:$('sHours').value.trim(), reviewUrl:$('sReview').value.trim() });
+              hours:$('sHours').value.trim(), reviewUrl:$('sReview').value.trim(),
+              bookingsUrl:$('sBookUrl').value.trim(), bookingsSecret:$('sBookSecret').value.trim() });
     const p=$('sPin').value.trim(); if(p) localStorage.setItem(PIN_KEY,p);
-    flash('setMsg','✓ Saved'); renderDash(); renderKit();
+    flash('setMsg','✓ Saved'); renderDash(); renderKit(); renderInbox();
+  };
+  $('testBook').onclick = async () => {
+    P4.save({ bookingsUrl:$('sBookUrl').value.trim(), bookingsSecret:$('sBookSecret').value.trim() });
+    const m=$('bookMsg'); m.style.fontWeight='600';
+    if(!$('sBookUrl').value.trim()){ m.style.color='var(--red)'; m.textContent='Add the endpoint URL first.'; return; }
+    m.style.color='var(--ink-2)'; m.textContent='Testing…';
+    try {
+      const list = await fetchBookings();
+      m.style.color='var(--green)';
+      m.textContent = `✓ Connected — ${list.length} booking${list.length===1?'':'s'} in the sheet.`;
+      renderInbox();
+    } catch(err){
+      m.style.color='var(--red)';
+      m.textContent = '✗ ' + err.message + ' (check the URL, the secret, and that access is set to "Anyone")';
+    }
   };
 
   /* utils */

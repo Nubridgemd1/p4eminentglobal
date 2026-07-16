@@ -11,6 +11,9 @@ window.P4_DEFAULTS = {
   reviewUrl: '',        // Google review link — set in admin
   hours: 'Mon–Sat, 8:00 AM – 6:00 PM',
   site: 'p4eminentglobal.com',
+  // Bookings inbox (Google Apps Script web app). Set both in admin → Settings.
+  bookingsUrl: '',      // the /exec URL
+  bookingsSecret: '',   // must match SECRET in backend/Code.gs
 };
 
 window.P4 = (function () {

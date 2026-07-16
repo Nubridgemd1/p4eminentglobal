@@ -494,37 +494,62 @@ footer a:hover{color:var(--amber)}
   document.getElementById('quickForm').addEventListener('submit', e => {
     e.preventDefault();
     const d = quickData();
+    record(d, 'quick-quote · email');
     window.location.href = mailto('Quote request — ' + d.service, compose(d));
   });
   document.getElementById('qSmsBtn').addEventListener('click', () => {
     const f = document.getElementById('quickForm');
     if (!f.reportValidity()) return;
-    window.location.href = smsLink(compose(quickData()));
+    const d = quickData(); record(d, 'quick-quote · text');
+    window.location.href = smsLink(compose(d));
   });
   document.getElementById('qWaBtn').addEventListener('click', () => {
     const f = document.getElementById('quickForm');
     if (!f.reportValidity()) return;
-    window.open(waLink(compose(quickData())), '_blank');
+    const d = quickData(); record(d, 'quick-quote · whatsapp');
+    window.open(waLink(compose(d)), '_blank');
   });
 
   function bookingData(){
     return { name:bName.value, phone:bPhone.value, email:bEmail.value, service:bService.value,
              date:bDate.value, time:bTime.value, addr:bAddr.value, desc:bDesc.value };
   }
+
+  // Record the booking in the inbox (Google Apps Script) so it shows in the admin portal.
+  // Fire-and-forget: the customer's email/text/WhatsApp send must never be blocked by this.
+  function record(d, source){
+    if (!P4.isSet(S.bookingsUrl)) return;
+    try {
+      fetch(S.bookingsUrl, {
+        method: 'POST',
+        mode: 'no-cors',                       // Apps Script doesn't send CORS headers
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          secret: S.bookingsSecret, name: d.name, phone: d.phone, email: d.email || '',
+          service: d.service, date: d.date || '', time: d.time || '',
+          address: d.addr || '', notes: d.desc || '', source: source
+        }),
+        keepalive: true                        // survives the page navigating to mailto:/sms:
+      }).catch(()=>{});
+    } catch(e){}
+  }
   document.getElementById('bookForm').addEventListener('submit', e => {
     e.preventDefault();
     const d = bookingData();
+    record(d, 'booking · email');
     window.location.href = mailto('Booking request — ' + d.service + ' — ' + d.name, compose(d));
   });
   document.getElementById('waBtn').addEventListener('click', () => {
     const f = document.getElementById('bookForm');
     if (!f.reportValidity()) return;
-    window.open(waLink(compose(bookingData())), '_blank');
+    const d = bookingData(); record(d, 'booking · whatsapp');
+    window.open(waLink(compose(d)), '_blank');
   });
   document.getElementById('smsBtn').addEventListener('click', () => {
     const f = document.getElementById('bookForm');
     if (!f.reportValidity()) return;
-    window.location.href = smsLink(compose(bookingData()));
+    const d = bookingData(); record(d, 'booking · text');
+    window.location.href = smsLink(compose(d));
   });
 
   // min date = today
