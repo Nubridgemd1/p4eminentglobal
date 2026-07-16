@@ -8,7 +8,7 @@ const D = __dirname.replace(/\\/g,'/').replace(/\/tools$/,'') + '/marketing/';
    SITE back to 'https://p4eminentglobal.com' and re-run gen-flyers + render-flyers. */
 const SITE  = 'https://nubridgemd1.github.io/p4eminentglobal/';
 const PHONE = '(347) 812-9270';
-const EMAIL = 'samuel.jumbo@gmail.com';
+const EMAIL = 'p4eminentglobal@gmail.com';
 const WEB   = 'p4eminentglobal.com';
 const AREA  = 'Houston, TX';
 const AREA_LONG = 'Houston, TX & surrounding areas';

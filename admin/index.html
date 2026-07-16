@@ -163,9 +163,14 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 
     <!-- SERVICES -->
     <div class="page" id="pg-services">
-      <div class="phead"><h2>Services &amp; Pricing</h2><p>Edit what you offer and the "quotes from" price shown on the site.</p></div>
+      <div class="phead"><h2>Services &amp; Pricing</h2><p>Add, edit or remove what you offer and the "quotes from" price shown on the site.</p></div>
+      <div class="row" style="justify-content:space-between;margin-bottom:14px">
+        <span id="svcCountLbl" style="font-size:13px;color:var(--ink-2);font-weight:600"></span>
+        <button class="btn btn-navy" id="addSvc">+ Add service</button>
+      </div>
       <div id="svcEditor" class="grid g2"></div>
-      <div class="row" style="margin-top:14px">
+      <div class="note" id="svcEmpty" style="display:none">No services yet. Add at least one — your site lists these publicly.</div>
+      <div class="row" style="margin-top:14px;position:sticky;bottom:12px">
         <button class="btn btn-amber" id="saveSvc">Save services</button>
         <button class="btn btn-ghost" id="resetSvc">Reset to defaults</button>
         <span id="svcMsg"></span>
@@ -359,13 +364,30 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
     if(d){ if(confirm('Delete this job?')){ jobs=jobs.filter(x=>x.id!==d); save(JOBS_KEY,jobs); renderJobs(); renderDash(); } }
   });
 
-  /* services */
+  /* services — add / edit / remove */
+
+  // Read the form back into `services` so add/remove never discards in-progress edits.
+  function collectSvc(){
+    document.querySelectorAll('#svcEditor [data-s]').forEach(el=>{
+      const i=+el.dataset.s, k=el.dataset.k;
+      if(!services[i]) return;
+      services[i][k] = k==='items' ? el.value.split('\n').map(x=>x.trim()).filter(Boolean)
+                     : k==='from' ? Number(el.value)||0 : el.value;
+    });
+  }
+  function slug(n){ return String(n||'service').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'service'; }
+
   function renderSvc(){
+    $('svcCountLbl').textContent = services.length + (services.length===1?' service':' services') + ' shown on your site';
+    $('svcEmpty').style.display = services.length ? 'none' : 'block';
     $('svcEditor').innerHTML = services.map((s,i)=>`
       <div class="card">
         <div class="row" style="justify-content:space-between">
-          <h3 style="font-size:18px;color:var(--navy)">${s.icon} ${esc(s.name)}</h3>
-          <span style="font-size:11px;color:var(--ink-2)">#${i+1}</span>
+          <h3 style="font-size:18px;color:var(--navy)">${s.icon||'🔧'} ${esc(s.name)}</h3>
+          <div class="row" style="gap:6px">
+            <span style="font-size:11px;color:var(--ink-2)">#${i+1}</span>
+            <button class="btn btn-red" style="padding:5px 10px;font-size:12px" data-rm="${i}">Remove</button>
+          </div>
         </div>
         <div class="field" style="margin-top:10px"><label>Name</label><input data-s="${i}" data-k="name" value="${esc(s.name)}"></div>
         <div class="field"><label>Description</label><textarea data-s="${i}" data-k="blurb" rows="2">${esc(s.blurb)}</textarea></div>
@@ -376,16 +398,39 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
         <div class="field"><label>Items (one per line)</label><textarea data-s="${i}" data-k="items" rows="4">${esc(s.items.join('\n'))}</textarea></div>
       </div>`).join('');
   }
-  $('saveSvc').onclick = () => {
-    document.querySelectorAll('[data-s]').forEach(el=>{
-      const i=+el.dataset.s, k=el.dataset.k;
-      services[i][k] = k==='items' ? el.value.split('\n').map(x=>x.trim()).filter(Boolean)
-                     : k==='from' ? Number(el.value)||0 : el.value;
-    });
-    save(SVC_KEY,services); flash('svcMsg','✓ Services saved'); renderJobs();
+  $('addSvc').onclick = () => {
+    collectSvc();
+    services.push({ id:'svc'+Date.now(), icon:'🔧', name:'New service',
+      blurb:'Describe this service in a sentence.', items:['What\'s included'], from:0 });
+    renderSvc();
+    const cards = document.querySelectorAll('#svcEditor .card');
+    const last = cards[cards.length-1];
+    if(last){ last.scrollIntoView({behavior:'smooth',block:'center'});
+      const n = last.querySelector('[data-k="name"]'); if(n){ n.focus(); n.select(); } }
+    flash('svcMsg','Added — edit it, then Save services');
   };
-  $('resetSvc').onclick = () => { if(!confirm('Reset services to defaults?')) return;
-    services = JSON.parse(JSON.stringify(window.P4_SERVICES_DEFAULT)); save(SVC_KEY,services); renderSvc(); flash('svcMsg','✓ Reset'); };
+
+  document.addEventListener('click', e => {
+    const rm = e.target.dataset?.rm;
+    if(rm === undefined) return;
+    const i = +rm;
+    if(!confirm(`Remove "${services[i].name}" from your site?`)) return;
+    collectSvc();
+    services.splice(i,1);
+    save(SVC_KEY,services);
+    renderSvc(); renderJobs();
+    flash('svcMsg','✓ Removed and saved');
+  });
+
+  $('saveSvc').onclick = () => {
+    collectSvc();
+    services.forEach(s => { if(!s.id) s.id = slug(s.name); });
+    save(SVC_KEY,services);
+    flash('svcMsg', '✓ Saved — ' + services.length + ' services live on your site');
+    renderSvc(); renderJobs();
+  };
+  $('resetSvc').onclick = () => { if(!confirm('Reset services to defaults? Any services you added will be lost.')) return;
+    services = JSON.parse(JSON.stringify(window.P4_SERVICES_DEFAULT)); save(SVC_KEY,services); renderSvc(); renderJobs(); flash('svcMsg','✓ Reset to defaults'); };
 
   /* specs */
   function renderSpec(){

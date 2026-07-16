@@ -6,7 +6,7 @@ window.P4_DEFAULTS = {
   tagline: 'Your Global Service Partner',
   promise: "Instead of buying a new one, we fix it for you.",
   phone: '(347) 812-9270',
-  email: 'samuel.jumbo@gmail.com',
+  email: 'p4eminentglobal@gmail.com',
   area: 'Houston, TX & surrounding areas',
   reviewUrl: '',        // Google review link — set in admin
   hours: 'Mon–Sat, 8:00 AM – 6:00 PM',

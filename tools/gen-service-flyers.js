@@ -3,7 +3,7 @@
 const fs = require('fs');
 const D = __dirname.replace(/\\/g,'/').replace(/\/tools$/,'') + '/marketing/';
 
-const PHONE='(347) 812-9270', EMAIL='samuel.jumbo@gmail.com', WEB='p4eminentglobal.com';
+const PHONE='(347) 812-9270', EMAIL='p4eminentglobal@gmail.com', WEB='p4eminentglobal.com';
 const AREA='Houston, TX', AREA_LONG='Houston, TX & surrounding areas';
 
 const FONTS = `<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">`;
