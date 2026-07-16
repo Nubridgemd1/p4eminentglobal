@@ -43,7 +43,7 @@ const ctaBar = `
 <div class="cta-bar">
   <div>
     <div class="web">${WEB}</div>
-    <div class="c">📞 <b>${PHONE}</b> &nbsp;·&nbsp; ✉️ ${EMAIL}</div>
+    <div class="c">📞 <b>${PHONE}</b> <span style="color:var(--amber)">— call or text</span> &nbsp;·&nbsp; ✉️ ${EMAIL}</div>
     <div class="area">📍 Serving ${AREA_LONG}</div>
   </div>
   <div class="qr"><img src="qr-site.svg" alt="Scan"><div class="cap">SCAN FOR QUOTE</div></div>

@@ -100,7 +100,7 @@ ${page(1,3,`
       <div><div style="color:#7FA3C4;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700">Service area</div>
            <div style="font-weight:700;margin-top:2px">${AREA}</div></div>
       <div><div style="color:#7FA3C4;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700">Contact</div>
-           <div style="font-weight:700;margin-top:2px">${PHONE} · ${EMAIL}</div></div>
+           <div style="font-weight:700;margin-top:2px">${PHONE} <span style="color:var(--amber)">(call or text)</span> · ${EMAIL}</div></div>
     </div>
   </div>
 </div>
@@ -138,8 +138,8 @@ ${page(2,3,`
 
   <div class="flow" style="margin-top:16px">
     ${[['1','Discover','Finds you via flyer QR, a shared video, search or word of mouth.'],
-       ['2','Quote','Sends the fault in seconds — quick-quote form or the full booking form.'],
-       ['3','Book','Picks a date and time window; the request lands with you instantly.'],
+       ['2','Quote','Sends the fault in seconds — by email or text, straight from the quick-quote form.'],
+       ['3','Book','Picks a date and time window, then sends by email, text or WhatsApp.'],
        ['4','Fixed','You diagnose, quote honestly and repair. Job tracked in the portal.'],
        ['5','Review','Prompted to leave a review, which brings the next customer.']]
       .map(([n,h,d])=>`<div class="st"><div class="n">${n}</div><h4>${h}</h4><p>${d}</p></div>`).join('')}
@@ -152,7 +152,7 @@ ${page(2,3,`
        ['How it works','Four steps from broken to fixed, so expectations are set before contact.'],
        ['Job specification','Scope of work, pricing &amp; terms, what you need from them, and your commitments — published openly.'],
        ['Booking form','Name, phone, email, service, preferred date &amp; time window, address and fault description.'],
-       ['Two-way delivery','Booking sends by <b>email</b> or <b>WhatsApp</b> — the customer chooses, both reach you.'],
+       ['Three-way delivery','Booking sends by <b>email</b>, <b>text (SMS)</b> or <b>WhatsApp</b> — the customer picks; all three reach you.'],
        ['Reviews','A one-tap review request. Collects by email today; switches to Google the moment a review link is added.'],
        ['Mobile &amp; QR','Fully responsive with no sideways scroll, and every flyer carries a QR straight to the site.']]
       .map(([h,d])=>`<div class="card"><h3>${h}</h3><p>${d}</p></div>`).join('')}
@@ -160,9 +160,10 @@ ${page(2,3,`
 
   <div class="kick">How a booking reaches you</div>
   <div class="ok">
-    <b>Bookings are delivered directly to you.</b> The form composes a complete message — name, phone, service,
-    preferred date/time, address and the fault — and sends it to <b>${EMAIL}</b>, or opens WhatsApp to
-    <b>${PHONE}</b>. Nothing sits in a queue waiting to be checked.
+    <b>Bookings are delivered directly to you — three ways.</b> The form composes one complete message
+    (name, phone, service, preferred date/time, address and the fault) and the customer sends it however they
+    prefer: <b>email</b> to ${EMAIL}, <b>text</b> to ${PHONE}, or <b>WhatsApp</b> to the same number.
+    Every route carries the identical details, and nothing sits in a queue waiting to be checked.
   </div>
   <div class="note" style="margin-top:10px">
     <b>Worth knowing:</b> the site is a fast static site with no server database. Bookings therefore arrive in your

@@ -56,7 +56,7 @@ const ctaBar = (line) => `
   <div class="qr"><img src="qr-site.svg" alt="Scan"><div class="cap">SCAN FOR QUOTE</div></div>
 </div>`;
 
-const contactLine = `📞 <b>${PHONE}</b> &nbsp;·&nbsp; ✉️ ${EMAIL}`;
+const contactLine = `📞 <b>${PHONE}</b> <span style="color:var(--amber)">— call or text</span> &nbsp;·&nbsp; ✉️ ${EMAIL}`;
 
 /* 1. hero */
 const f1 = page(`
@@ -181,7 +181,7 @@ const f4 = page(`
     <div style="margin-top:26px;background:var(--amber);color:var(--navy3);border-radius:12px;padding:17px 22px;
                 display:flex;align-items:center;justify-content:space-between;gap:14px">
       <div>
-        <div class="disp" style="font-size:29px">CALL OR WHATSAPP</div>
+        <div class="disp" style="font-size:29px">CALL · TEXT · WHATSAPP</div>
         <div style="font-size:13px;font-weight:600">Mon–Sat, 8:00 AM – 6:00 PM</div>
       </div>
       <div class="disp" style="font-size:35px">${PHONE}</div>
@@ -216,9 +216,9 @@ const f5 = page(`
                 display:flex;align-items:center;gap:26px;text-align:left">
       <div class="qr" style="border:1px solid var(--line)"><img src="qr-site.svg" alt="Scan"><div class="cap">SCAN TO GET A QUOTE</div></div>
       <div style="flex:1">
-        <div class="disp" style="font-size:31px;color:var(--navy)">SCAN · CALL · EMAIL</div>
+        <div class="disp" style="font-size:31px;color:var(--navy)">SCAN · CALL · TEXT · EMAIL</div>
         <div style="font-size:16px;color:var(--ink);margin-top:9px;line-height:1.8">
-          📞 <b>${PHONE}</b><br>✉️ ${EMAIL}<br>🌐 ${WEB}</div>
+          📞 <b>${PHONE}</b> &nbsp;<span style="color:var(--amber-d);font-weight:700">call or text</span><br>✉️ ${EMAIL}<br>🌐 ${WEB}</div>
       </div>
     </div>
 
