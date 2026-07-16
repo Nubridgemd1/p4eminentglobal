@@ -207,12 +207,14 @@ footer a:hover{color:var(--amber)}
           <div class="field"><label for="qName">Your name</label><input id="qName" required></div>
           <div class="field"><label for="qPhone">Phone</label><input id="qPhone" required inputmode="tel"></div>
         </div>
-        <div style="display:flex;gap:8px;margin-top:4px">
-          <button class="btn btn-amber" type="submit" style="flex:1.4">📧 Get my quote</button>
+        <button class="btn btn-amber" type="submit" style="width:100%;margin-top:4px">📧 Get my quote by email</button>
+        <div style="display:flex;gap:8px;margin-top:8px">
           <button class="btn btn-ghost" type="button" id="qSmsBtn"
                   style="flex:1;color:var(--navy);border-color:var(--navy)">💬 Text it</button>
+          <button class="btn btn-ghost" type="button" id="qWaBtn"
+                  style="flex:1;color:var(--navy);border-color:var(--navy)">📱 WhatsApp</button>
         </div>
-        <p class="sm" style="text-align:center;margin-top:10px">Free · No obligation · Email or text — we reply fast</p>
+        <p class="sm" style="text-align:center;margin-top:10px">Free · No obligation · Email, text or WhatsApp — we reply fast</p>
       </form>
     </div>
   </div>
@@ -498,6 +500,11 @@ footer a:hover{color:var(--amber)}
     const f = document.getElementById('quickForm');
     if (!f.reportValidity()) return;
     window.location.href = smsLink(compose(quickData()));
+  });
+  document.getElementById('qWaBtn').addEventListener('click', () => {
+    const f = document.getElementById('quickForm');
+    if (!f.reportValidity()) return;
+    window.open(waLink(compose(quickData())), '_blank');
   });
 
   function bookingData(){
