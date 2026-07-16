@@ -242,12 +242,20 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
           <p style="font-size:13px;color:var(--ink-2)">One tap to send your link and offer.</p></div>
           <div class="row">
             <a class="btn btn-amber" id="shareWa" target="_blank">💬 WhatsApp</a>
+            <a class="btn btn-ghost" id="shareFb" target="_blank">📘 Facebook</a>
             <button class="btn btn-ghost" id="copyLink">🔗 Copy link</button>
+            <button class="btn btn-ghost" id="copyCaption">📝 Copy caption</button>
             <a class="btn btn-ghost" id="shareReview" target="_blank">★ Review link</a>
             <a class="btn btn-ghost" id="askReview" target="_blank">⭐ Ask for a review</a>
           </div>
         </div>
         <div id="reviewHint" style="margin-top:12px"></div>
+        <div class="note" style="margin-top:10px">
+          📷 <b>Instagram:</b> Instagram doesn't allow posting from a website — no site can.
+          On your <b>phone</b>, 📷 opens the share sheet with Instagram in it. On a <b>computer</b>,
+          it downloads the file and copies the caption so you can post from the app.
+          <b>Open this page on your phone</b> for one-tap Instagram posting.
+        </div>
       </div>
       <h3 style="font-size:20px;color:var(--navy);margin:6px 0 10px">Flyers</h3>
       <div class="grid g4" id="flyerGrid"></div>
@@ -590,7 +598,10 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
     const url='https://p4eminentglobal.com';
     const msg=`Don't buy a new one — we fix it for you. 🔧\n\nP4 Eminent Global — handyman, electronics & equipment restoration.\nFree quotes: ${url}\n${P4.isSet(S.phone)?'📞 '+S.phone:''}`;
     $('shareWa').href='https://wa.me/?text='+encodeURIComponent(msg);
+    $('shareFb').href=fbShare(SITE);
     $('copyLink').onclick=()=>{navigator.clipboard.writeText(url);$('copyLink').textContent='✓ Copied';setTimeout(()=>$('copyLink').textContent='🔗 Copy link',1500);};
+    $('copyCaption').onclick=()=>{navigator.clipboard.writeText(caption());
+      $('copyCaption').textContent='✓ Caption copied';setTimeout(()=>$('copyCaption').textContent='📝 Copy caption',1800);};
     // Review link to share with customers: Google when set, else the email review form.
     const emailReview = 'mailto:'+encodeURIComponent(S.email)+
       '?subject='+encodeURIComponent('My review of P4 Eminent Global')+
@@ -615,9 +626,11 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
         <div class="body"><h4>${t}</h4><p>${d}</p>
           <div class="acts">
             <a class="btn btn-amber" href="../marketing/${f}.png" download>Download</a>
-            <a class="btn btn-ghost" href="../marketing/${f}.pdf" target="_blank">Print PDF</a>
-            <a class="btn btn-ghost" target="_blank"
-               href="https://wa.me/?text=${encodeURIComponent(msg)}">Share</a>
+            <a class="btn btn-ghost" href="../marketing/${f}.pdf" target="_blank">PDF</a>
+            <a class="btn btn-ghost" target="_blank" href="https://wa.me/?text=${encodeURIComponent(msg)}">💬</a>
+            <a class="btn btn-ghost" target="_blank" title="Share to Facebook"
+               href="${fbShare(SITE)}">📘</a>
+            <button class="btn btn-ghost" title="Share to Instagram" data-ig="${f}.png">📷</button>
           </div></div></div>`).join('');
 
     $('videoGrid').innerHTML = VIDEOS.map(([f,t,d])=>`
@@ -628,8 +641,58 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
           <div class="acts">
             <a class="btn btn-amber" href="../marketing/${f}.mp4" download>Download</a>
             <a class="btn btn-ghost" href="../marketing/${f}.mp4" target="_blank">Open</a>
+            <a class="btn btn-ghost" target="_blank" title="Share to Facebook" href="${fbShare(SITE)}">📘</a>
+            <button class="btn btn-ghost" title="Share to Instagram" data-ig="${f}.mp4">📷</button>
           </div></div></div>`).join('');
   }
+
+  /* ---------- social sharing ----------
+     Facebook has a share URL. Instagram has none — it only accepts posts from the
+     phone's gallery — so we use the native share sheet (Instagram appears there on
+     mobile) and fall back to download + copy caption on desktop. */
+  const SITE = 'https://p4eminentglobal.com';
+  const fbShare = u => 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(u);
+
+  function caption(){
+    const S = P4.get();
+    return [
+      "Don't buy a new one — we fix it for you. 🔧",'',
+      'P4 Eminent Global — handyman, HVAC, painting, power washing, electronics,',
+      'appliances and equipment repair.',
+      P4.isSet(S.area) ? '📍 ' + S.area : null,
+      P4.isSet(S.phone) ? '📞 ' + S.phone + ' (call or text)' : null,
+      '🌐 ' + SITE, '',
+      '#Houston #HoustonTX #handyman #HVAC #ACrepair #painting #powerwashing',
+      '#appliancerepair #electronicsrepair #repair #fixitdontreplaceit #HoustonHandyman'
+    ].filter(Boolean).join('\n');
+  }
+
+  async function shareAsset(file){
+    const url = SITE + '/marketing/' + file;
+    const cap = caption();
+    // Mobile: native share sheet — Instagram, Facebook, WhatsApp all appear as targets.
+    try {
+      const res  = await fetch('../marketing/' + file);
+      const blob = await res.blob();
+      const f    = new File([blob], file, { type: blob.type });
+      if (navigator.canShare && navigator.canShare({ files:[f] })) {
+        await navigator.share({ files:[f], text: cap });
+        return;
+      }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    // Desktop: Instagram can't accept a web post — download it and copy the caption.
+    try { await navigator.clipboard.writeText(cap); } catch(e){}
+    const a = document.createElement('a');
+    a.href = '../marketing/' + file; a.download = file;
+    document.body.appendChild(a); a.click(); a.remove();
+    alert('Instagram doesn\'t allow posting from a website.\n\n' +
+          '✓ The file has been downloaded\n✓ The caption is copied to your clipboard\n\n' +
+          'Open the Instagram app, create a post with that file, and paste the caption.\n\n' +
+          'Tip: opening this admin page on your phone gives you a direct "Share to Instagram" option.');
+  }
+  document.addEventListener('click', e => {
+    const f = e.target.dataset?.ig; if(f) shareAsset(f);
+  });
 
   /* ---------- bookings inbox (Google Apps Script) ---------- */
   async function fetchBookings(){
