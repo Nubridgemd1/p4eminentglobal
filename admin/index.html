@@ -102,6 +102,41 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
   </div>
 </div>
 
+<!-- QUOTE MODAL -->
+<div id="qModal" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(10,24,38,.6);
+     backdrop-filter:blur(3px);padding:20px;overflow:auto">
+  <div style="max-width:620px;margin:34px auto;background:#fff;border-radius:16px;overflow:hidden;
+              box-shadow:0 30px 70px rgba(0,0,0,.4)">
+    <div style="background:var(--navy);color:#fff;padding:16px 22px;display:flex;align-items:center;justify-content:space-between">
+      <div><h3 style="font-size:20px">Send a quote</h3>
+        <p style="font-size:12px;color:#9DB4CC" id="qmWho"></p></div>
+      <button class="btn btn-ghost" id="qmClose" style="padding:6px 12px">✕</button>
+    </div>
+    <div style="padding:20px">
+      <div class="grid g2">
+        <div class="field"><label>Quote amount ($)</label><input id="qmAmt" type="number" min="0" step="1"></div>
+        <div class="field"><label>Timeframe</label>
+          <select id="qmWhen">
+            <option>this week</option><option>within 2–3 days</option>
+            <option>tomorrow</option><option>next week</option><option>at a time that suits you</option>
+          </select></div>
+      </div>
+      <div class="field"><label>What the quote covers</label>
+        <textarea id="qmScope" rows="2" placeholder="e.g. Diagnosis, capacitor replacement and full system test"></textarea></div>
+      <div class="field"><label>Message preview (edit if you like)</label>
+        <textarea id="qmMsg" rows="9" style="font-size:13px"></textarea></div>
+      <div class="row">
+        <button class="btn btn-amber" id="qmEmail">📧 Send by email</button>
+        <button class="btn btn-ghost" id="qmSms">💬 Send by text</button>
+        <button class="btn btn-ghost" id="qmWa">📱 Send by WhatsApp</button>
+      </div>
+      <p style="font-size:11.5px;color:var(--ink-2);margin-top:10px">
+        Sending saves the quote against the job and marks it <b>Booked</b>.</p>
+      <div id="qmWarn" style="margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
 <!-- APP -->
 <div id="app">
   <div class="top">
@@ -134,9 +169,10 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
       <div class="phead"><h2>Bookings &amp; Jobs</h2><p>Log every enquiry and track it through to completion.</p></div>
       <div class="card">
         <h3 style="font-size:19px;color:var(--navy)">Add a job</h3>
-        <div class="grid g3" style="margin-top:12px">
+        <div class="grid g4" style="margin-top:12px">
           <div class="field"><label>Customer</label><input id="jName"></div>
-          <div class="field"><label>Phone</label><input id="jPhone"></div>
+          <div class="field"><label>Phone</label><input id="jPhone" placeholder="for text / WhatsApp"></div>
+          <div class="field"><label>Email</label><input id="jEmail" type="email" placeholder="to quote by email"></div>
           <div class="field"><label>Service</label><select id="jService"></select></div>
         </div>
         <div class="grid g3">
@@ -338,6 +374,7 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
         <td>${esc(j.service||'—')}</td><td>${j.date||'—'}</td><td>${j.quote?money(j.quote):'—'}</td>
         <td><span class="pill ${PILL[j.status]}">${LBL[j.status]}</span></td>
         <td style="text-align:right;white-space:nowrap">
+          <button class="btn btn-amber" style="padding:5px 9px;font-size:12px" data-quote="${j.id}">Send quote</button>
           ${j.status!=='done'?`<button class="btn btn-ghost" style="padding:5px 9px;font-size:12px" data-adv="${j.id}">Advance</button> `:''}
           <button class="btn btn-red" style="padding:5px 9px;font-size:12px" data-del="${j.id}">Delete</button></td>
       </tr>`).join('')}</tbody></table></div>`;
@@ -352,17 +389,87 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
   $('addJob').onclick = () => {
     if(!$('jName').value.trim()) return alert('Add a customer name.');
     jobs.push({ id:'j'+Date.now(), name:$('jName').value.trim(), phone:$('jPhone').value.trim(),
-      service:$('jService').value, date:$('jDate').value, quote:$('jQuote').value,
-      status:$('jStatus').value, notes:$('jNotes').value.trim() });
+      email:$('jEmail').value.trim(), service:$('jService').value, date:$('jDate').value,
+      quote:$('jQuote').value, status:$('jStatus').value, notes:$('jNotes').value.trim() });
     save(JOBS_KEY,jobs);
-    ['jName','jPhone','jDate','jQuote','jNotes'].forEach(i=>$(i).value='');
+    ['jName','jPhone','jEmail','jDate','jQuote','jNotes'].forEach(i=>$(i).value='');
     renderJobs(); renderDash();
   };
   document.addEventListener('click', e => {
-    const a=e.target.dataset?.adv, d=e.target.dataset?.del;
+    const a=e.target.dataset?.adv, d=e.target.dataset?.del, q=e.target.dataset?.quote;
     if(a){ const j=jobs.find(x=>x.id===a); j.status = j.status==='new'?'booked':'done'; save(JOBS_KEY,jobs); renderJobs(); renderDash(); }
     if(d){ if(confirm('Delete this job?')){ jobs=jobs.filter(x=>x.id!==d); save(JOBS_KEY,jobs); renderJobs(); renderDash(); } }
+    if(q){ openQuote(q); }
   });
+
+  /* ---------- quote responder ---------- */
+  let qJob = null;
+
+  function quoteText(j){
+    const S=P4.get();
+    const amt = $('qmAmt').value ? '$'+Number($('qmAmt').value).toLocaleString() : '[amount]';
+    const scope = $('qmScope').value.trim();
+    return [
+      `Hi ${j.name || 'there'},`,'',
+      `Thanks for your enquiry with P4 Eminent Global about ${j.service || 'your repair'}.`,
+      j.notes ? `You told us: ${j.notes}` : null, '',
+      `YOUR QUOTE: ${amt}`,
+      scope ? `Covers: ${scope}` : null,
+      `We could get to you ${$('qmWhen').value}.`, '',
+      `This is free and no obligation. Reply to confirm and we'll book you in.`,
+      `And remember — instead of buying a new one, we fix it for you.`, '',
+      `— P4 Eminent Global`,
+      `${S.phone} (call or text) · ${S.email}`,
+      P4.isSet(S.area) ? `Serving ${S.area}` : null,
+    ].filter(x => x !== null).join('\n');
+  }
+  function refreshQuoteMsg(){ if(qJob) $('qmMsg').value = quoteText(qJob); }
+
+  function openQuote(id){
+    qJob = jobs.find(x=>x.id===id);
+    if(!qJob) return;
+    $('qmWho').textContent = `${qJob.name || 'Customer'} · ${qJob.service || '—'}${qJob.phone ? ' · '+qJob.phone : ''}`;
+    $('qmAmt').value = qJob.quote || '';
+    $('qmScope').value = '';
+    refreshQuoteMsg();
+    const missing = [];
+    if(!qJob.phone) missing.push('phone number (needed for text/WhatsApp)');
+    if(!qJob.email) missing.push('email address (needed to send by email)');
+    $('qmWarn').innerHTML = missing.length
+      ? `<div class="note">This job has no ${missing.join(' and no ')}. Add it under the job to use that channel.</div>` : '';
+    $('qModal').style.display='block';
+  }
+  const closeQuote = () => { $('qModal').style.display='none'; qJob=null; };
+  $('qmClose').onclick = closeQuote;
+  $('qModal').addEventListener('click', e => { if(e.target.id==='qModal') closeQuote(); });
+  ['qmAmt','qmWhen','qmScope'].forEach(id => $(id).addEventListener('input', refreshQuoteMsg));
+
+  function afterSend(){
+    if(!qJob) return;
+    qJob.quote = $('qmAmt').value || qJob.quote;
+    if(qJob.status === 'new') qJob.status = 'booked';
+    save(JOBS_KEY,jobs); renderJobs(); renderDash();
+    closeQuote();
+  }
+  const jobDigits = j => String(j.phone||'').replace(/[^0-9]/g,'');
+
+  $('qmEmail').onclick = () => {
+    if(!qJob.email) return alert('This job has no email address. Add one under the job, or send by text/WhatsApp.');
+    window.location.href = 'mailto:'+encodeURIComponent(qJob.email)+
+      '?subject='+encodeURIComponent('Your quote from P4 Eminent Global — '+(qJob.service||''))+
+      '&body='+encodeURIComponent($('qmMsg').value);
+    afterSend();
+  };
+  $('qmSms').onclick = () => {
+    if(!jobDigits(qJob)) return alert('This job has no phone number. Add one under the job.');
+    window.location.href = 'sms:+1'+jobDigits(qJob)+'?&body='+encodeURIComponent($('qmMsg').value);
+    afterSend();
+  };
+  $('qmWa').onclick = () => {
+    if(!jobDigits(qJob)) return alert('This job has no phone number. Add one under the job.');
+    window.open('https://wa.me/1'+jobDigits(qJob)+'?text='+encodeURIComponent($('qmMsg').value), '_blank');
+    afterSend();
+  };
 
   /* services — add / edit / remove */
 
