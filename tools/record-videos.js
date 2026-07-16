@@ -6,7 +6,9 @@ const D = __dirname.replace(/\\/g,'/').replace(/\/tools$/,'') + '/marketing/';
 const FF = 'C:/Users/tojug/OneDrive/Desktop/BIZFORMCORP BUILD/bizformcorp/node_modules/@ffmpeg-installer/win32-x64/ffmpeg.exe';
 
 (async () => {
-  for (const name of ['video1','video2','video3','video4','video5']) {
+  // record every video*.html present (numbered set + per-service set)
+  const names = fs.readdirSync(D).filter(f => /^video.*\.html$/.test(f)).map(f => f.replace(/\.html$/,''));
+  for (const name of names) {
     const vid = D + 'rec_' + name + '/';
     if (fs.existsSync(vid)) fs.rmSync(vid, {recursive:true, force:true});
     fs.mkdirSync(vid, {recursive:true});

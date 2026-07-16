@@ -284,15 +284,21 @@ td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
   let specs = load(SPEC_KEY, null) || JSON.parse(JSON.stringify(SPEC_DEFAULT));
 
   const FLYERS=[['flyer1','Don\'t Replace It','Bold hero — the core promise'],
-    ['flyer2','Services Menu','All four service lines + prices'],
+    ['flyer2','Services Menu','All seven service lines + prices'],
     ['flyer3','Before You Buy New','Cost-comparison angle'],
     ['flyer4','Same-Week Booking','Urgency + easy booking'],
-    ['flyer5','Free Quote Offer','Quote-led, QR to book']];
-  const VIDEOS=[['video1','Don\'t Replace It','~15s · vertical'],
-    ['video2','What We Fix','~15s · vertical'],
-    ['video3','How It Works','~15s · vertical'],
-    ['video4','Free Quote','~12s · vertical'],
-    ['video5','Book Today','~12s · vertical']];
+    ['flyer5','Free Quote Offer','Quote-led, QR to book'],
+    ['flyer-hvac','HVAC — Don\'t Replace Your AC','Service flyer · HVAC · from $95'],
+    ['flyer-painting','Painting — Inside & Out','Service flyer · Painting · from $150'],
+    ['flyer-powerwash','Power Washing — Look New Again','Service flyer · Power washing · from $120']];
+  const VIDEOS=[['video1','Don\'t Replace It','~12s · vertical'],
+    ['video2','What We Fix','~12s · vertical'],
+    ['video3','How It Works','~11s · vertical'],
+    ['video4','Free Quote','~10s · vertical'],
+    ['video5','Book Today','~10s · vertical'],
+    ['video-hvac','HVAC — Don\'t Replace Your AC','~14s · vertical'],
+    ['video-painting','Painting — Inside & Out','~14s · vertical'],
+    ['video-powerwash','Power Washing — Look New Again','~14s · vertical']];
 
   /* ---------- boot ---------- */
   function boot(){ renderSettings(); renderDash(); renderJobs(); renderSvc(); renderSpec(); renderKit(); }

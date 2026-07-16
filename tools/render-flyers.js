@@ -4,8 +4,10 @@ const fs = require('fs');
 const D = __dirname.replace(/\\/g,'/').replace(/\/tools$/,'') + '/marketing/';
 
 (async () => {
+  // render every flyer*.html present (numbered set + per-service set)
+  const targets = fs.readdirSync(D).filter(f => /^flyer.*\.html$/.test(f)).map(f => f.replace(/\.html$/, ''));
   const b = await chromium.launch();
-  for (const f of ['flyer1','flyer2','flyer3','flyer4','flyer5']) {
+  for (const f of targets) {
     const p = await b.newPage({ viewport:{width:794,height:1123}, deviceScaleFactor:2 });
     await p.goto('file:///'+D+f+'.html', { waitUntil:'networkidle' });
     await p.waitForTimeout(400);
@@ -21,6 +23,6 @@ const D = __dirname.replace(/\\/g,'/').replace(/\/tools$/,'') + '/marketing/';
   }
   await b.close();
   // remove intermediate html so it isn't deployed
-  ['flyer1','flyer2','flyer3','flyer4','flyer5'].forEach(f => fs.rmSync(D+f+'.html', {force:true}));
-  console.log('flyers rendered');
+  targets.forEach(f => fs.rmSync(D+f+'.html', {force:true}));
+  console.log(targets.length + ' flyers rendered');
 })();
