@@ -100,9 +100,10 @@ const VIDEOS = {
       brandScene('s1'),
       `<div class="scene" id="s2"><div class="kick fadeUp d1">What we fix</div>
         <div class="chips">
-          <div class="chip fadeUp d1">🛠️ Handyman</div><div class="chip fadeUp d2">🔌 Electronics</div>
-          <div class="chip fadeUp d3">🧰 Appliances</div><div class="chip fadeUp d4">⚙️ Equipment</div>
-          <div class="chip fadeUp d5">🔧 Restoration</div></div>
+          <div class="chip fadeUp d1">🛠️ Handyman</div><div class="chip fadeUp d1">❄️ HVAC</div>
+          <div class="chip fadeUp d2">🎨 Painting</div><div class="chip fadeUp d3">💦 Power Washing</div>
+          <div class="chip fadeUp d4">🔌 Electronics</div><div class="chip fadeUp d4">🧰 Appliances</div>
+          <div class="chip fadeUp d5">⚙️ Equipment</div></div>
         <div class="sub fadeUp d5">If it's broken — start with us.</div></div>`,
       `<div class="scene" id="s3"><div class="disp mid fadeUp d1">INSTEAD OF BUYING<br>A NEW ONE,<br><span class="amber">WE FIX IT.</span></div></div>`,
       ctaScene('s4','GET A<br><span class="amber">FREE QUOTE</span>')],

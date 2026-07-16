@@ -63,7 +63,7 @@ const f1 = page(`
   <div style="position:absolute;left:46px;right:46px;top:52px;color:#fff">
     <div class="logo"><div class="mark">P4</div><div><div class="lname" style="color:#fff">EMINENT GLOBAL</div><div class="lsub">Fix • Restore • Maintain</div></div></div>
     <div style="margin-top:40px;display:flex;gap:10px;flex-wrap:wrap">
-      <span class="pill">Handyman · Electronics · Equipment</span>
+      <span class="pill">Handyman · HVAC · Painting · Power Washing</span>
       <span class="geo">📍 ${AREA}</span>
     </div>
     <div class="disp" style="font-size:100px;margin-top:22px;color:#fff">DON'T BUY<br>A NEW ONE.</div>
@@ -81,6 +81,9 @@ const f1 = page(`
 /* 2. services */
 const svc = [
   ['🛠️','HANDYMAN &amp; REPAIRS','Doors · drywall · mounting · assembly · fixtures','75'],
+  ['❄️','HVAC SERVICES','AC · heating · thermostats · ducts · servicing','95'],
+  ['🎨','PAINTING — IN &amp; OUT','Walls · ceilings · siding · trim · cabinets','150'],
+  ['💦','POWER WASHING','Walls · siding · driveways · decks · fences','120'],
   ['🔌','ELECTRONICS REPAIR','TVs · laptops · audio · power supplies','60'],
   ['🧰','APPLIANCE RESTORATION','Washers · dryers · microwaves · cookers','90'],
   ['⚙️','EQUIPMENT SERVICING','Generators · power tools · pumps · motors','120'],
@@ -202,7 +205,7 @@ const f5 = page(`
       Tell us what's broken. We'll tell you what it costs to fix — and we'll be honest if it isn't worth it.</div>
 
     <div style="margin-top:30px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
-      ${['🛠️ Handyman','🔌 Electronics','🧰 Appliances','⚙️ Equipment'].map(t=>`
+      ${['🛠️ Handyman','❄️ HVAC','🎨 Painting','💦 Power Washing','🔌 Electronics','🧰 Appliances','⚙️ Equipment'].map(t=>`
         <span style="border:1.5px solid var(--line);border-radius:30px;padding:9px 18px;font-size:14.5px;font-weight:600;color:var(--ink)">${t}</span>`).join('')}
     </div>
 
