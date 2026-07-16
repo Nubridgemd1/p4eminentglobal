@@ -3,10 +3,8 @@ const QRCode = require(NM+'/qrcode');
 const fs = require('fs');
 const D = __dirname.replace(/\\/g,'/').replace(/\/tools$/,'') + '/marketing/';
 
-/* QR target. p4eminentglobal.com still serves GoDaddy's "Launching Soon" page, so the QR
-   points at the live preview for now. Once the domain is repointed to this site, change
-   SITE back to 'https://p4eminentglobal.com' and re-run gen-flyers + render-flyers. */
-const SITE  = 'https://nubridgemd1.github.io/p4eminentglobal/';
+/* QR target — the live domain. Print-safe: this is permanent. */
+const SITE  = 'https://p4eminentglobal.com';
 const PHONE = '(347) 812-9270';
 const EMAIL = 'p4eminentglobal@gmail.com';
 const WEB   = 'p4eminentglobal.com';
